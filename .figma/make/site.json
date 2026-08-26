@@ -1,0 +1,17 @@
+{
+  "description": "Discover and shop a curated selection of premium colognes with a sleek, responsive layout that enhances user experience and simplifies navigation.",
+  "language": "FA",
+  "robots": {
+    "index": false
+  },
+  "icons": {
+    "icon": "/.figma/make/favicon.png"
+  },
+  "openGraph": {
+    "image": "/.figma/make/social-image.png"
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

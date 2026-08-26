@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Vazirmatn', system-ui, sans-serif;
+}
+
+/* ── Dark mode (default) ── */
+:root {
+  --bg:           #0e0d0c;
+  --bg-nav:       rgba(14,13,12,0.92);
+  --bg-card:      #1a1815;
+  --bg-card2:     #111009;
+  --bg-muted:     #2a2620;
+  --fg:           #f0ece4;
+  --fg-muted:     #a89e8a;
+  --fg-dim:       #7d7264;
+  --fg-dimmer:    #4a4540;
+  --gold:         #c9a84c;
+  --gold-hover:   #dbbf6b;
+  --gold-text:    #0e0d0c;
+  --border:       #2e2a24;
+  --border-hover: #c9a84c4d;
+  --overlay:      rgba(14,13,12,0.70);
+  --shadow:       0 8px 40px rgba(0,0,0,0.5);
+}
+
+/* ── Light mode ── */
+:root.light {
+  --bg:           #f7f3ec;
+  --bg-nav:       rgba(247,243,236,0.94);
+  --bg-card:      #ffffff;
+  --bg-card2:     #f0ebe0;
+  --bg-muted:     #ede8de;
+  --fg:           #1a1410;
+  --fg-muted:     #5c4f3a;
+  --fg-dim:       #8a7560;
+  --fg-dimmer:    #b8a890;
+  --gold:         #a8822a;
+  --gold-hover:   #c9a84c;
+  --gold-text:    #ffffff;
+  --border:       #ddd5c4;
+  --border-hover: #a8822a4d;
+  --overlay:      rgba(247,243,236,0.70);
+  --shadow:       0 8px 40px rgba(0,0,0,0.12);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--fg-dim); }
