@@ -14,6 +14,8 @@ import Shipping from "../pages/legal/Shipping";
 import Returns from "../pages/legal/Returns";
 import FAQ from "../pages/legal/FAQ";
 import Privacy from "../pages/legal/Privacy";
+import ProductDetail from "../pages/ProductDetail";
+import UserPanel from "../pages/UserPanel";
 
 function Root() {
   return (
@@ -29,7 +31,6 @@ function Root() {
   );
 }
 
-/* Login page skips the Navbar/Footer shell */
 function LoginRoot() {
   return (
     <AppProvider>
@@ -56,6 +57,8 @@ export const router = createBrowserRouter([
       { path: "returns", Component: Returns },
       { path: "faq", Component: FAQ },
       { path: "privacy", Component: Privacy },
+      { path: "product/:id", Component: ProductDetail },
+      { path: "dashboard", Component: UserPanel },
     ],
   },
   { path: "/login", Component: LoginRoot },

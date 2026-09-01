@@ -23,7 +23,7 @@ function useClickOutside(ref: React.RefObject<HTMLElement | null>, cb: () => voi
 }
 
 export default function Navbar() {
-  const { isDark, toggleDark, cartItems, cartCount, addToCart, removeFromCart } = useApp();
+  const { isDark, toggleDark, cartItems, cartCount, addToCart, removeOneFromCart, isLoggedIn } = useApp();
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -40,6 +40,7 @@ export default function Navbar() {
     : [];
 
   const total = cartItems.reduce((s, i) => s + i.price * i.qty, 0);
+
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -94,10 +95,10 @@ export default function Navbar() {
             )}
           </button>
 
-          {/* Login */}
-          <Link to="/login" aria-label="ورود به حساب" className="w-9 h-9 flex items-center justify-center transition-colors" style={{ color: "var(--fg-muted)" }}
+          {/* Login / Dashboard */}
+          <Link to={isLoggedIn ? "/dashboard" : "/login"} aria-label="حساب کاربری" className="w-9 h-9 flex items-center justify-center transition-colors" style={{ color: isLoggedIn ? "var(--gold)" : "var(--fg-muted)" }}
             onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--gold)")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--fg-muted)")}
+            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = isLoggedIn ? "var(--gold)" : "var(--fg-muted)")}
           >
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" strokeLinecap="round" strokeLinejoin="round" />
@@ -180,15 +181,15 @@ export default function Navbar() {
                     <>
                       <ul dir="rtl" className="max-h-64 overflow-y-auto divide-y" style={{ borderColor: "var(--border)" }}>
                         {cartItems.map((item) => (
-                          <li key={item.id} className="flex items-center gap-3 px-4 py-3">
-                            <img src={item.image} alt={item.name} className="w-10 h-12 object-cover rounded shrink-0" />
+                          <li key={`${item.product.id}-${item.volumeMl}`} className="flex items-center gap-3 px-4 py-3">
+                            <img src={item.product.image} alt={item.product.name} className="w-10 h-12 object-cover rounded shrink-0" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold truncate" style={{ fontFamily: FA, color: "var(--fg)" }}>{item.name}</p>
-                              <p className="text-xs mt-0.5" style={{ fontFamily: FA, color: "var(--fg-dim)" }}>{item.subtitle}</p>
+                              <p className="text-sm font-semibold truncate" style={{ fontFamily: FA, color: "var(--fg)" }}>{item.product.name}</p>
+                              <p className="text-xs mt-0.5" style={{ fontFamily: FA, color: "var(--fg-dim)" }}>{item.volumeMl} ml</p>
                               <div className="flex items-center gap-2 mt-1">
-                                <button onClick={() => { const p = PRODUCTS.find(p => p.id === item.id); if (p) addToCart(p); }} className="w-5 h-5 rounded flex items-center justify-center" style={{ backgroundColor: "var(--bg-muted)", color: "var(--fg-muted)" }}>+</button>
+                                <button onClick={() => { const vol = item.product.volumes.find((v) => v.ml === item.volumeMl); if (vol) addToCart(item.product, vol); }} className="w-5 h-5 rounded flex items-center justify-center" style={{ backgroundColor: "var(--bg-muted)", color: "var(--fg-muted)" }}>+</button>
                                 <span className="text-xs" style={{ fontFamily: FA, color: "var(--fg)" }}>{item.qty}</span>
-                                <button onClick={() => removeFromCart(item.id)} className="w-5 h-5 rounded flex items-center justify-center" style={{ backgroundColor: "var(--bg-muted)", color: "var(--fg-muted)" }}>−</button>
+                                <button onClick={() => removeOneFromCart(item.product.id, item.volumeMl)} className="w-5 h-5 rounded flex items-center justify-center" style={{ backgroundColor: "var(--bg-muted)", color: "var(--fg-muted)" }}>−</button>
                               </div>
                             </div>
                             <span className="text-xs font-bold shrink-0" style={{ fontFamily: FA, color: "var(--gold)" }}>{(item.price * item.qty).toLocaleString("fa-IR")}</span>

@@ -10,9 +10,9 @@ const discounted   = PRODUCTS.filter((p) => !!p.discount);
 const autumn       = PRODUCTS.filter((p) => p.isAutumn);
 
 /* ─── Animated scroll indicator ─── */
-function ScrollIndicator() {
+function ScrollIndicator({ onScroll }: { onScroll: () => void }) {
   return (
-    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
+    <div onClick={onScroll} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 cursor-pointer">
       <p className="text-xs tracking-[0.25em] uppercase" style={{ fontFamily: FA, color: "var(--fg-dimmer)" }}>اسکرول</p>
       {/* Mouse outline with animated dot */}
       <div
@@ -40,6 +40,9 @@ function ScrollIndicator() {
 
 /* ─── Hero ─── */
 function Hero() {
+  function scrollToFeatures() {
+    document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+  }
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ backgroundColor: "var(--bg-card2)" }}>
       {/* Autumn perfume image — perfume bottle on a boot (warm amber tones) */}
@@ -93,7 +96,7 @@ function Hero() {
         </div>
       </div>
 
-      <ScrollIndicator />
+      <ScrollIndicator onScroll={scrollToFeatures} />
     </section>
   );
 }
@@ -158,7 +161,7 @@ function Features() {
     { icon: "🎁", title: "بسته‌بندی هدیه", sub: "رایگان به همراه هر سفارش" },
   ];
   return (
-    <section dir="rtl" className="border-y py-8 transition-colors" style={{ borderColor: "var(--border)" }}>
+    <section id="features" dir="rtl" className="border-y py-8 transition-colors" style={{ borderColor: "var(--border)" }}>
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
         {items.map((it) => (
           <div key={it.title} className="flex flex-col items-center text-center gap-2">
