@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>PRFX | فروشگاه عطر</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
@@ -20,7 +19,7 @@
     <div class="title-row"><h1>فروشگاه</h1><input id="search" placeholder="جستجوی عطر یا برند..."></div>
     <div id="shop-products" class="grid">@foreach($products as $p)<x-product-card :product="$p" />@endforeach</div>
 @elseif($page === 'product')
-    <section class="product-detail"><div><img src="{{ $product->image }}" alt="{{ $product->name }}"></div><div><small>{{ $product->brand }}</small><h1>{{ $product->name }}</h1><p>{{ $product->description }}</p><div class="price">{{ toman($product->price) }}</div><select id="volume">@foreach($product->variants as $v)<option value="{{ $v->volume_ml }}" data-price="{{ $v->price }}">{{ $v->volume_ml }} میلی‌لیتر — {{ toman($v->price) }}</option>@endforeach</select><button class="btn" onclick="addProduct({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ $product->image }}')">افزودن به سبد</button></div></section>
+    <section class="product-detail"><div><img src="{{ $product->image }}" alt="{{ $product->name }}"></div><div><small>{{ $product->brand }}</small><h1>{{ $product->name }}</h1><p>{{ $product->description }}</p><div class="price">{{ toman($product->price) }}</div><select id="volume">@foreach($product->variants as $v)<option value="{{ $v->volume_ml }}" data-price="{{ $v->price }}">{{ $v->volume_ml }} میلی‌لیتر — {{ toman($v->price) }}</option>@endforeach</select><button class="btn" onclick="addProduct({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ $product->image }}', document.getElementById('volume').value, document.getElementById('volume').selectedOptions[0].dataset.price)">افزودن به سبد</button></div></section>
 @elseif($page === 'cart')
     <h1>سبد خرید</h1><div id="cart-items"></div><div id="checkout" class="checkout"></div>
 @elseif($page === 'login')
@@ -30,6 +29,6 @@
 @endif
 </main>
 <footer>© {{ date('Y') }} PRFX — فروشگاه عطر</footer>
-<script>window.PRFX={api:'{{ url('/api') }}',csrf:'{{ csrf_token() }}'};</script>
+<script>window.PRFX={api:'{{ url('/api') }}'};</script>
 <script src="{{ asset('js/app.js') }}"></script>
 </body></html>
