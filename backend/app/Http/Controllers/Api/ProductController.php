@@ -1,7 +1,55 @@
 <?php
+
 namespace App\Http\Controllers\Api;
-use App\Http\Controllers\Controller; use App\Models\Product; use Illuminate\Http\Request;
-class ProductController extends Controller {
- public function index(Request $r){$q=Product::with(['variants','images'])->withCount(['reviews as approved_reviews_count'=>fn($x)=>$x->where('status','approved')]); if($r->filled('search')) $q->where(fn($x)=>$x->where('name','like','%'.$r->search.'%')->orWhere('brand','like','%'.$r->search.'%')->orWhere('sku','like','%'.$r->search.'%')); foreach(['brand','gender','family'] as $f) if($r->filled($f)) $q->whereIn($f,(array)$r->$f); if($r->filled('season')) $q->whereJsonContains('season',$r->season); if($r->filled('min_price')) $q->where('price','>=',$r->min_price); if($r->filled('max_price')) $q->where('price','<=',$r->max_price); if($r->sort==='asc') $q->orderBy('price'); elseif($r->sort==='desc') $q->orderByDesc('price'); elseif($r->sort==='newest') $q->orderByDesc('is_new')->orderByDesc('created_at'); return $q->paginate($r->integer('per_page',12)); }
- public function show(Product $product){return $product->load(['variants','images','reviews'=>fn($q)=>$q->where('status','approved')->with('user:id,name')]);}
+
+use App\Http\Controllers\Controller;
+use App\Models\Product;
+use Illuminate\Http\Request;
+
+class ProductController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Product::query()
+            ->with(['variants', 'images'])
+            ->withCount(['reviews as approved_reviews_count' => fn ($q) => $q->where('status', 'approved')]);
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->input('search'));
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('brand', 'like', "%{$search}%")
+                    ->orWhere('sku', 'like', "%{$search}%");
+            });
+        }
+
+        foreach (['brand', 'gender', 'family'] as $field) {
+            if ($request->filled($field)) {
+                $values = is_array($request->input($field)) ? $request->input($field) : [$request->input($field)];
+                $query->whereIn($field, $values);
+            }
+        }
+
+        if ($request->filled('season')) $query->whereJsonContains('season', $request->input('season'));
+        if ($request->filled('min_price') && is_numeric($request->input('min_price'))) $query->where('price', '>=', (float) $request->input('min_price'));
+        if ($request->filled('max_price') && is_numeric($request->input('max_price'))) $query->where('price', '<=', (float) $request->input('max_price'));
+
+        match ($request->input('sort')) {
+            'asc' => $query->orderBy('price'),
+            'desc' => $query->orderByDesc('price'),
+            'newest' => $query->orderByDesc('is_new')->orderByDesc('created_at'),
+            default => $query->latest('id'),
+        };
+
+        return $query->paginate(min(max($request->integer('per_page', 12), 1), 50));
+    }
+
+    public function show(Product $product)
+    {
+        return response()->json($product->load([
+            'variants',
+            'images',
+            'reviews' => fn ($q) => $q->where('status', 'approved')->with('user:id,name'),
+        ]));
+    }
 }
