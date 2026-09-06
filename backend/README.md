@@ -1,49 +1,78 @@
-# PRFX Laravel Backend
+# PRFX — Laravel + MySQL + Vanilla JavaScript
 
-API backend designed from the existing React storefront. The UI currently exposes shop/catalog filtering, product details, cart/checkout, phone + 5-digit OTP login, dashboard orders and addresses. The frontend currently keeps cart/auth in localStorage/context, so this backend provides the persistent API layer.
+The React/TypeScript storefront has been removed from this branch. The project now uses a normal Laravel 12 application with Blade for HTML and plain JavaScript for cart, OTP login, checkout and account requests.
 
 ## Stack
-- Laravel 12 / PHP 8.2+
-- Sanctum bearer tokens
-- MySQL or PostgreSQL
-- Transactional checkout with row locking and stock decrement
+- PHP 8.2+
+- Laravel 12
+- MySQL 8+
+- Laravel Sanctum
+- Blade + Vanilla JavaScript + CSS
+- No React, TypeScript, Vite, npm or pnpm
 
-## Setup
+## Run
+
 ```bash
 cd backend
 composer install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate
+```
+
+Create the MySQL database first:
+
+```sql
+CREATE DATABASE prfx CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+Then set these values in `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=prfx
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Run migrations and seed products:
+
+```bash
+php artisan migrate:fresh --seed
 php artisan serve
 ```
 
-Configure `DB_*` in `.env`. For OTP delivery, replace the local/debug response in `AuthController@sendOtp` with your SMS provider. Never expose `debug_otp` outside local development.
+Open `http://127.0.0.1:8000`.
+
+## Pages
+- `/` home
+- `/shop` products + search
+- `/product/{id}` product details
+- `/cart` cart + checkout
+- `/login` phone/OTP login
+- `/account` user + orders
 
 ## API
-- `POST /api/auth/otp/send` `{phone}`
-- `POST /api/auth/otp/verify` `{phone,otp}` -> Sanctum token
-- `GET /api/products` supports `search`, `brand[]`, `gender[]`, `family[]`, `season`, `min_price`, `max_price`, `sort`, `per_page`
+- `POST /api/auth/otp/send`
+- `POST /api/auth/otp/verify`
+- `GET /api/products`
 - `GET /api/products/{id}`
-- `GET /api/orders` authenticated
-- `GET /api/orders/{id}` authenticated
-- `POST /api/orders` authenticated
-- `GET /api/me` authenticated
-- `POST /api/auth/logout` authenticated
+- `GET /api/me` (auth)
+- `POST /api/auth/logout` (auth)
+- `GET /api/orders` (auth)
+- `GET /api/orders/{id}` (auth)
+- `POST /api/orders` (auth)
+- `GET /api/addresses` (auth)
+- `POST /api/addresses` (auth)
+- `PUT /api/addresses/{id}` (auth)
+- `DELETE /api/addresses/{id}` (auth)
+- `POST /api/products/{id}/reviews` (auth)
+- `DELETE /api/reviews/{id}` (auth)
 
-## Checkout payload
-```json
-{
-  "items":[{"product_id":1,"volume_ml":35,"quantity":1}],
-  "shipping_method":"post",
-  "receiver":"نام و نام خانوادگی",
-  "phone":"09123456789",
-  "province":"تهران",
-  "city":"تهران",
-  "postal_code":"1234567890",
-  "address":"آدرس کامل",
-  "note":""
-}
-```
+## Checkout rules
+Checkout validates each selected product variant, locks its MySQL row inside a transaction, checks stock, decrements stock, snapshots the product name/price into `order_items`, and creates the order only when all items are valid.
 
-Shipping follows the UI rule: orders >= 5,000,000 تومان are free; Post is 120,000 تومان below that threshold; Tipax is currently 0 and can be replaced by a real carrier quote.
+Shipping: subtotal >= 5,000,000 تومان is free; otherwise Post costs 120,000 تومان and Tipax is currently 0 as a placeholder.
+
+OTP is deliberately returned only as `debug_otp` when `APP_ENV=local`. Replace that section with your SMS provider before production.
