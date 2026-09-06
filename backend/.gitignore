@@ -1,0 +1,12 @@
+/vendor/
+.env
+.env.*
+!/ .env.example
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+/storage/*.key
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitkeep
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
