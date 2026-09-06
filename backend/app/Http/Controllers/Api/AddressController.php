@@ -12,14 +12,10 @@ class AddressController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'label' => ['nullable','string','max:50'],
-            'receiver' => ['required','string','max:120'],
-            'phone' => ['required','regex:/^09\d{9}$/'],
-            'province' => ['required','string','max:100'],
-            'city' => ['required','string','max:100'],
-            'postal_code' => ['required','string','max:20'],
-            'address' => ['required','string','max:2000'],
-            'is_default' => ['sometimes','boolean'],
+            'label' => ['nullable','string','max:50'], 'receiver' => ['required','string','max:120'],
+            'phone' => ['required','regex:/^09\d{9}$/'], 'province' => ['required','string','max:100'],
+            'city' => ['required','string','max:100'], 'postal_code' => ['required','string','max:20'],
+            'address' => ['required','string','max:2000'], 'is_default' => ['sometimes','boolean'],
         ]);
         if (($data['is_default'] ?? false) === true) $request->user()->addresses()->update(['is_default' => false]);
         if ($request->user()->addresses()->count() === 0) $data['is_default'] = true;
@@ -35,8 +31,9 @@ class AddressController extends Controller
             'city' => ['required','string','max:100'], 'postal_code' => ['required','string','max:20'],
             'address' => ['required','string','max:2000'], 'is_default' => ['sometimes','boolean'],
         ]);
-        if (($data['is_default'] ?? false) === true) $request->user()->addresses()->whereKeyNot($model->id)->update(['is_default' => false]);
-        return response()->json(tap($model)->update($data) ? $model->fresh() : $model);
+        if (($data['is_default'] ?? false) === true) $request->user()->addresses()->where('id', '!=', $model->id)->update(['is_default' => false]);
+        $model->update($data);
+        return response()->json($model->fresh());
     }
 
     public function destroy(Request $request, int $address)
